@@ -64,7 +64,7 @@ export default function PersonnelAdminLayout({
             scrollbarWidth: "thin",
             scrollbarGutter: "stable",
           }}>
-          <div style={{ marginBottom: "10px" }}>
+          <div style={{ marginBottom: "10px", marginTop: 10 }}>
             <Row>
               <Col
                 span={7}
@@ -73,23 +73,34 @@ export default function PersonnelAdminLayout({
                   justifyContent: "center",
                   alignItems: "center",
                 }}>
-                <Icons.MonitorCog width={90} height={90} color="#ffffff" />
+                <Icons.MonitorCog width={60} height={60} color="#ffffff" />
               </Col>
               <Col span={17}>
-                <Title style={{ marginBottom: 0, color: "#FDFEFE" }} level={3}>
-                  {"ระบบการจัดการ"}
+                <Title
+                  style={{ marginBottom: 0, marginTop: 0, color: "#FDFEFE" }}
+                  level={3}>
+                  {"ระบบอินทราเน็ต"}
                 </Title>
                 <Title style={{ marginTop: 0, color: "#FDFEFE" }} level={5}>
-                  {"เข้าถึงระบบในองค์กร"}
+                  {"ภายในองค์กร"}
                 </Title>
               </Col>
             </Row>
           </div>
           <Menu
             theme="dark"
-            defaultSelectedKeys={["all"]}
+            defaultSelectedKeys={["home"]}
             mode="inline"
             items={[
+              {
+                key: "home",
+                icon: <Icons.House />,
+                style: { fontSize: 16, color: "#FDFEFE" },
+                label: "หน้าหลัก",
+                onClick: () => {
+                  router.push(`/private`);
+                },
+              },
               {
                 key: "user",
                 icon: <Icons.Users />,
@@ -123,6 +134,15 @@ export default function PersonnelAdminLayout({
                 label: "ระบบในองค์กร",
                 onClick: () => {
                   router.push(`/private/system`);
+                },
+              },
+              {
+                key: "setting",
+                icon: <Icons.Settings />,
+                style: { fontSize: 16, color: "#FDFEFE" },
+                label: "ตั้งค่า",
+                onClick: () => {
+                  router.push(`/private/setting`);
                 },
               },
             ]}

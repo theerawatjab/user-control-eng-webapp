@@ -8,47 +8,43 @@ import {
   Pagination,
   PaginationProps,
   Row,
-  Space,
   Table,
   TableProps,
   Typography,
   Tooltip,
-  InputNumber,
-  Popconfirm,
-  Switch,
+  Space,
+  Breadcrumb,
 } from "antd";
 import { useRouter } from "next/navigation";
 import * as Icons from "lucide-react";
 import { convertDateTimeFormate, convertDateTimeToNumber } from "@/app/utils";
 
-export default function SystemIndexPage() {
+export default function SystemAccessRoleIndexPage() {
   const { Title } = Typography;
   const [form] = Form.useForm();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [tableLoading, setTableLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [systems, setSystems] = useState<SystemList>({
+  const [roles, setRoles] = useState<RoleList>({
     data: [],
     page: 0,
     totalPage: 1,
     limit: 0,
     totalCount: 0,
   });
-  const [confirmLoading, setConfirmLoading] = useState(false);
   const [currentSearch, setcurrentSearch] = useState({
     thaiName: "",
-    shortName: "",
+    englishName: "",
   });
 
   const columns: TableProps["columns"] = [
     {
-      title: "Id",
-      dataIndex: "id",
-      key: "id",
+      title: "ลำดับ",
+      dataIndex: "sequence",
+      key: "sequence",
       align: "center",
-      sorter: (a, b) => a.id - b.id,
-      hidden: true,
+      sorter: (a, b) => a.sequence - b.sequence,
     },
     {
       title: "ชื่อภาษาไทย",
@@ -71,79 +67,23 @@ export default function SystemIndexPage() {
       sorter: (a, b) => a.englishName.length - b.englishName.length,
     },
     {
-      title: "ชื่อย่อ",
+      title: "ชื่อย่อภาษาไทย",
       onHeaderCell: () => {
         return { style: { textAlign: "center" } }; // Center-align the header
       },
       align: "left",
-      dataIndex: "shortName",
-      key: "shortName",
-      sorter: (a, b) => a.shortName.length - b.shortName.length,
+      dataIndex: "thaiShortName",
+      key: "thaiShortName",
+      sorter: (a, b) => a.thaiShortName.length - b.thaiShortName.length,
     },
     {
-      title: "การมองเห็น",
-      dataIndex: "visibility",
-      key: "visibility",
-      align: "center",
-      render: (_, record) => {
-        return (
-          <Space
-            size="middle"
-            style={{
-              textAlign: "center",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}>
-            <Row gutter={[16, 16]}>
-              {record.visibility === "show" && (
-                <Col span={8}>
-                  <Popconfirm
-                    okText="ใช่"
-                    cancelText="ไม่"
-                    title="ซ่อน"
-                    description="คุณต้องการซ่อนระบบ?"
-                    okButtonProps={{ loading: confirmLoading }}>
-                    <Switch
-                      checkedChildren="แสดง"
-                      unCheckedChildren="ซ่อน"
-                      checked={record.visibility === "show"}
-                    />
-                  </Popconfirm>
-                </Col>
-              )}
-              {record.visibility !== "show" && (
-                <Col span={8}>
-                  <Popconfirm
-                    okText="ใช่"
-                    cancelText="ไม่"
-                    title="แสดง"
-                    description="คุณต้องการแสดงระบบ?"
-                    okButtonProps={{ loading: confirmLoading }}>
-                    <Switch
-                      checkedChildren="แสดง"
-                      unCheckedChildren="ซ่อน"
-                      checked={record.visibility === "show"}
-                    />
-                  </Popconfirm>
-                </Col>
-              )}
-            </Row>
-          </Space>
-        );
+      title: "รายละเอียด",
+      onHeaderCell: () => {
+        return { style: { textAlign: "center" } }; // Center-align the header
       },
-      filters: [
-        {
-          text: "แสดง",
-          value: "show",
-        },
-        {
-          text: "ซ่อน",
-          value: "hide",
-        },
-      ],
-      onFilter: (value, record) =>
-        record.visibility.startsWith(value as string),
+      align: "left",
+      dataIndex: "description",
+      key: "description",
     },
     {
       title: "แก้ไขล่าสุด",
@@ -178,18 +118,18 @@ export default function SystemIndexPage() {
                 <Icons.BookOpenText
                   onClick={() => {
                     setLoading(true);
-                    router.push(`/private/system/${record.id}/detail`);
+                    router.push(`/private/setting/role/${record.id}`);
                   }}
                   size={16}
                 />
               </Tooltip>
             </Col>
             <Col span={8}>
-              <Tooltip title="จัดการสิทธิ์ระบบ">
-                <Icons.ShieldPlus
+              <Tooltip title="ลบ">
+                <Icons.Trash
                   onClick={() => {
                     setLoading(true);
-                    router.push(`/private/system/${record.id}/role`);
+                    router.push(`/private/setting/role/${record.id}`);
                   }}
                   size={16}
                 />
@@ -201,47 +141,44 @@ export default function SystemIndexPage() {
     },
   ];
 
-  const fetchSystem = async () => {
+  const fetchRole = async () => {
     try {
       const data = {
         data: [
           {
             id: 1,
-            thaiName: "ระบบบุคลากร",
-            englishName: "Personnel system",
-            shortName: "PN",
-            description: "xxxx",
-            visibility: "show",
-            updatedAt: "2025-07-03T10:15:23Z",
-            createdAt: "2025-07-03T10:15:23Z",
+            sequence: 1,
+            thaiName: "ผู้ดูแลระบบ",
+            englishName: "Admin",
+            description: "เป็นผู้ดูแลระบบนี้",
+            createdAt: "",
+            updatedAt: "",
           },
           {
             id: 2,
-            thaiName: "ระบบลา",
-            englishName: "Leave system",
-            shortName: "L",
-            description: "xxxx",
-            visibility: "hide",
-            updatedAt: "2025-07-03T10:17:45Z",
-            createdAt: "2025-07-03T10:15:23Z",
+            sequence: 2,
+            thaiName: "ผู้ใช้งานในระบบ",
+            englishName: "User",
+            description: "เป็นผู้ใช้งานในระบบนี้",
+            createdAt: "",
+            updatedAt: "",
           },
           {
             id: 3,
-            thaiName: "ระบบใช้รถ",
-            englishName: "Vehicle use system",
-            shortName: "VC",
-            description: "xxxx",
-            visibility: "hide",
-            updatedAt: "2025-07-03T10:18:12Z",
-            createdAt: "2025-07-03T10:15:23Z",
+            sequence: 3,
+            thaiName: "นิสิตในระบบ",
+            englishName: "Student",
+            description: "เป็นนิสิตในระบบนี้",
+            createdAt: "",
+            updatedAt: "",
           },
         ],
         page: 1,
         totalPage: 1,
         limit: 10,
-        totalCount: 3,
+        totalCount: 10,
       };
-      setSystems(data);
+      setRoles(data);
       setLoading(false);
       setTableLoading(false);
     } catch (error) {
@@ -258,14 +195,14 @@ export default function SystemIndexPage() {
   const onSearch = () => {
     setcurrentSearch({
       thaiName: form.getFieldValue("thaiName"),
-      shortName: form.getFieldValue("shortName"),
+      englishName: form.getFieldValue("englishName"),
     });
     setCurrentPage(1);
   };
 
   useEffect(() => {
     setTableLoading(true);
-    fetchSystem();
+    fetchRole();
   }, [currentPage, currentSearch]);
 
   return (
@@ -280,8 +217,28 @@ export default function SystemIndexPage() {
                   marginBottom: 0,
                   fontSize: 18,
                 }}>
-                {"ระบบที่เปิดใช้งาน"}
+                {"สิทธิ์เข้าถึงระบบนี้"}
               </Title>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={24}>
+              <Breadcrumb
+                items={[
+                  {
+                    title: (
+                      <a
+                        onClick={() => {
+                          setLoading(true);
+                          router.push(`/private/setting`);
+                        }}>
+                        การตั้งค่า
+                      </a>
+                    ),
+                  },
+                  { title: "รายการ" },
+                ]}
+              />
             </Col>
           </Row>
           <div className="chemds-container">
@@ -294,8 +251,8 @@ export default function SystemIndexPage() {
                     </Form.Item>
                   </Col>
                   <Col>
-                    <Form.Item name="shortName">
-                      <Input placeholder="ชื่อย่อ" allowClear />
+                    <Form.Item name="englishName">
+                      <Input placeholder="ชื่อภาษาอังกฤษ" allowClear />
                     </Form.Item>
                   </Col>
                   <Col>
@@ -318,7 +275,7 @@ export default function SystemIndexPage() {
                   type="primary"
                   onClick={() => {
                     setLoading(true);
-                    router.push(`/private/system/new`);
+                    router.push(`/private/setting/role/new`);
                   }}>
                   เพิ่ม
                 </Button>
@@ -329,7 +286,7 @@ export default function SystemIndexPage() {
                 <Table
                   columns={columns}
                   rowKey={(record) => record.id}
-                  dataSource={systems.data}
+                  dataSource={roles.data}
                   style={{ width: "100%" }}
                   pagination={false}
                   bordered
@@ -341,7 +298,7 @@ export default function SystemIndexPage() {
               <Col span={24}>
                 <Pagination
                   defaultCurrent={1}
-                  total={systems.totalCount}
+                  total={roles.totalCount}
                   showSizeChanger={false}
                   pageSize={10}
                   onChange={onPageChange}

@@ -22,3 +22,10 @@ body {
   background-color: white;
   border-radius: 15px;
 }
+
+.image-container img {
+  width: 150px; /* Set your desired width */
+  height: 150px; /* Set your desired height */
+  object-fit: cover; /* This keeps the image from stretching */
+  border-radius: 8px; /* Optional: adds rounded corners */
+}

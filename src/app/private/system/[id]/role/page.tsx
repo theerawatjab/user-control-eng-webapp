@@ -5,40 +5,50 @@ import {
   Col,
   Form,
   Input,
-  Pagination,
-  PaginationProps,
   Row,
   Space,
-  Table,
-  TableProps,
   Typography,
-  Tooltip,
+  Skeleton,
+  Breadcrumb,
+  notification,
   InputNumber,
+  Flex,
+  Descriptions,
+  TableProps,
   Popconfirm,
   Switch,
+  Tooltip,
+  PaginationProps,
+  Table,
+  Pagination,
 } from "antd";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { validateEmailInput } from "@/app/utils";
+import { ThemButtonColor } from "@/app/utils/constants";
 import * as Icons from "lucide-react";
 import { convertDateTimeFormate, convertDateTimeToNumber } from "@/app/utils";
 
-export default function SystemIndexPage() {
-  const { Title } = Typography;
+export default function RoleDetailPage() {
+  const { Title, Paragraph } = Typography;
   const [form] = Form.useForm();
   const router = useRouter();
+  const params = useParams();
   const [loading, setLoading] = useState(true);
+  const [api, contextHolder] = notification.useNotification();
   const [tableLoading, setTableLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [systems, setSystems] = useState<SystemList>({
-    data: [],
-    page: 0,
-    totalPage: 1,
-    limit: 0,
-    totalCount: 0,
-  });
+  const [roleSystemAccess, setRoleSystemAccess] =
+    useState<RoleSystemAccessList>({
+      data: [],
+      page: 0,
+      totalPage: 1,
+      limit: 0,
+      totalCount: 0,
+    });
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [currentSearch, setcurrentSearch] = useState({
     thaiName: "",
-    shortName: "",
+    englishName: "",
   });
 
   const columns: TableProps["columns"] = [
@@ -71,14 +81,13 @@ export default function SystemIndexPage() {
       sorter: (a, b) => a.englishName.length - b.englishName.length,
     },
     {
-      title: "ชื่อย่อ",
+      title: "ลิ้งค์",
       onHeaderCell: () => {
         return { style: { textAlign: "center" } }; // Center-align the header
       },
       align: "left",
-      dataIndex: "shortName",
-      key: "shortName",
-      sorter: (a, b) => a.shortName.length - b.shortName.length,
+      dataIndex: "link",
+      key: "link",
     },
     {
       title: "การมองเห็น",
@@ -102,7 +111,7 @@ export default function SystemIndexPage() {
                     okText="ใช่"
                     cancelText="ไม่"
                     title="ซ่อน"
-                    description="คุณต้องการซ่อนระบบ?"
+                    description="คุณต้องการซ่อนลิ้งค์?"
                     okButtonProps={{ loading: confirmLoading }}>
                     <Switch
                       checkedChildren="แสดง"
@@ -118,7 +127,7 @@ export default function SystemIndexPage() {
                     okText="ใช่"
                     cancelText="ไม่"
                     title="แสดง"
-                    description="คุณต้องการแสดงระบบ?"
+                    description="คุณต้องการแสดงลิ้งค์?"
                     okButtonProps={{ loading: confirmLoading }}>
                     <Switch
                       checkedChildren="แสดง"
@@ -178,18 +187,22 @@ export default function SystemIndexPage() {
                 <Icons.BookOpenText
                   onClick={() => {
                     setLoading(true);
-                    router.push(`/private/system/${record.id}/detail`);
+                    router.push(
+                      `/private/system/${params.id}/role/${record.id}/detail`
+                    );
                   }}
                   size={16}
                 />
               </Tooltip>
             </Col>
             <Col span={8}>
-              <Tooltip title="จัดการสิทธิ์ระบบ">
-                <Icons.ShieldPlus
+              <Tooltip title="จัดการสิทธิ์ผู้ใช้งาน">
+                <Icons.ShieldUser
                   onClick={() => {
                     setLoading(true);
-                    router.push(`/private/system/${record.id}/role`);
+                    router.push(
+                      `/private/system/${params.id}/role/${record.id}/permission`
+                    );
                   }}
                   size={16}
                 />
@@ -201,38 +214,28 @@ export default function SystemIndexPage() {
     },
   ];
 
-  const fetchSystem = async () => {
+  const fetchRoleDetail = async () => {
     try {
       const data = {
         data: [
           {
             id: 1,
-            thaiName: "ระบบบุคลากร",
-            englishName: "Personnel system",
-            shortName: "PN",
-            description: "xxxx",
+            thaiName: "ผูใช้งานระบบ",
+            englishName: "User",
+            iconName: "xxxx",
+            link: "http://localhost:3000/private/user",
             visibility: "show",
             updatedAt: "2025-07-03T10:15:23Z",
             createdAt: "2025-07-03T10:15:23Z",
           },
           {
             id: 2,
-            thaiName: "ระบบลา",
-            englishName: "Leave system",
-            shortName: "L",
-            description: "xxxx",
+            thaiName: "ผูดูแลระบบ",
+            englishName: "Admin",
+            iconName: "xxx",
+            link: "http://localhost:3000/private/admin",
             visibility: "hide",
             updatedAt: "2025-07-03T10:17:45Z",
-            createdAt: "2025-07-03T10:15:23Z",
-          },
-          {
-            id: 3,
-            thaiName: "ระบบใช้รถ",
-            englishName: "Vehicle use system",
-            shortName: "VC",
-            description: "xxxx",
-            visibility: "hide",
-            updatedAt: "2025-07-03T10:18:12Z",
             createdAt: "2025-07-03T10:15:23Z",
           },
         ],
@@ -241,7 +244,7 @@ export default function SystemIndexPage() {
         limit: 10,
         totalCount: 3,
       };
-      setSystems(data);
+      setRoleSystemAccess(data);
       setLoading(false);
       setTableLoading(false);
     } catch (error) {
@@ -258,30 +261,54 @@ export default function SystemIndexPage() {
   const onSearch = () => {
     setcurrentSearch({
       thaiName: form.getFieldValue("thaiName"),
-      shortName: form.getFieldValue("shortName"),
+      englishName: form.getFieldValue("englishName"),
     });
     setCurrentPage(1);
   };
 
   useEffect(() => {
     setTableLoading(true);
-    fetchSystem();
+    fetchRoleDetail();
   }, [currentPage, currentSearch]);
+
+  if (loading) {
+    return (
+      <>
+        {contextHolder}
+        <Skeleton active />
+      </>
+    );
+  }
 
   return (
     <>
       <div style={{ padding: 10 }}>
         <Space direction="vertical" style={{ width: "100%" }} size={10}>
           <Row>
-            <Col span={12}>
-              <Title
-                style={{
-                  marginTop: 0,
-                  marginBottom: 0,
-                  fontSize: 18,
-                }}>
-                {"ระบบที่เปิดใช้งาน"}
+            <Col span={24}>
+              <Title style={{ marginTop: 0, marginBottom: 0, fontSize: 18 }}>
+                {"การจัดการสิทธิ์ของระบบ"}
               </Title>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={24}>
+              <Breadcrumb
+                items={[
+                  {
+                    title: (
+                      <a
+                        onClick={() => {
+                          setLoading(true);
+                          router.push(`/private/system`);
+                        }}>
+                        ระบบที่เปิดใช้งาน
+                      </a>
+                    ),
+                  },
+                  { title: "ระบบ xxx" },
+                ]}
+              />
             </Col>
           </Row>
           <div className="chemds-container">
@@ -294,8 +321,8 @@ export default function SystemIndexPage() {
                     </Form.Item>
                   </Col>
                   <Col>
-                    <Form.Item name="shortName">
-                      <Input placeholder="ชื่อย่อ" allowClear />
+                    <Form.Item name="englishName">
+                      <Input placeholder="ชื่อภาษาอังกฤษ" allowClear />
                     </Form.Item>
                   </Col>
                   <Col>
@@ -318,7 +345,7 @@ export default function SystemIndexPage() {
                   type="primary"
                   onClick={() => {
                     setLoading(true);
-                    router.push(`/private/system/new`);
+                    router.push(`/private/system/${params.id}/role/new`);
                   }}>
                   เพิ่ม
                 </Button>
@@ -329,7 +356,7 @@ export default function SystemIndexPage() {
                 <Table
                   columns={columns}
                   rowKey={(record) => record.id}
-                  dataSource={systems.data}
+                  dataSource={roleSystemAccess.data}
                   style={{ width: "100%" }}
                   pagination={false}
                   bordered
@@ -341,7 +368,7 @@ export default function SystemIndexPage() {
               <Col span={24}>
                 <Pagination
                   defaultCurrent={1}
-                  total={systems.totalCount}
+                  total={roleSystemAccess.totalCount}
                   showSizeChanger={false}
                   pageSize={10}
                   onChange={onPageChange}

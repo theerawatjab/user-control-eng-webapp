@@ -12,14 +12,16 @@ import {
   Breadcrumb,
   notification,
   InputNumber,
+  Select,
 } from "antd";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { validateEmailInput } from "@/app/utils";
 
 export default function NewSystemPage() {
   const { Title } = Typography;
   const [form] = Form.useForm();
   const router = useRouter();
+  const params = useParams();
   const [loading, setLoading] = useState(true);
   const [api, contextHolder] = notification.useNotification();
 
@@ -51,7 +53,7 @@ export default function NewSystemPage() {
           <Row>
             <Col span={24}>
               <Title style={{ marginTop: 0, marginBottom: 0, fontSize: 18 }}>
-                {"ระบบที่เปิดใช้งาน"}
+                {"สิทธิ์ใหม่ของระบบ xxx"}
               </Title>
             </Col>
           </Row>
@@ -67,6 +69,17 @@ export default function NewSystemPage() {
                           router.push(`/private/system`);
                         }}>
                         ระบบที่เปิดใช้งาน
+                      </a>
+                    ),
+                  },
+                  {
+                    title: (
+                      <a
+                        onClick={() => {
+                          setLoading(true);
+                          router.push(`/private/system/${params.id}/role`);
+                        }}>
+                        ระบบ xxx
                       </a>
                     ),
                   },
@@ -123,17 +136,17 @@ export default function NewSystemPage() {
                 <Col span={12}>
                   <Form.Item
                     layout="vertical"
-                    name="shortName"
-                    label="ชื่อย่อ"
+                    name="link"
+                    label="ลิ้งค์"
                     style={{ width: "90%" }}
                     rules={[
                       {
                         required: true,
-                        message: "กรุณาใส่ข้อมูล ชื่อย่อ!",
+                        message: "กรุณาใส่ข้อมูล ลิ้งค์!",
                       },
                     ]}>
                     <Input
-                      placeholder="ชื่อย่อ"
+                      placeholder="ลิ้งค์"
                       allowClear
                       style={{ width: "100%" }}
                     />
@@ -144,14 +157,28 @@ export default function NewSystemPage() {
                 <Col span={12}>
                   <Form.Item
                     layout="vertical"
-                    name="description"
-                    label="รายละเอียด"
-                    style={{ width: "90%" }}>
-                    <Input.TextArea
-                      rows={4}
-                      placeholder="รายละเอียด"
-                      allowClear
-                      style={{ width: "100%" }}
+                    name="iconName"
+                    label="ภาพไอคอนสิทธิ์"
+                    style={{ width: "90%" }}
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณาเลือกข้อมูล ภาพไอคอนสิทธิ์!",
+                      },
+                    ]}>
+                    <Select
+                      showSearch
+                      placeholder="ภาพไอคอนสิทธิ์"
+                      filterOption={(input, option) =>
+                        (option?.label ?? "")
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      options={[
+                        { value: 1, label: "ไอคอนที่ 1" },
+                        { value: 2, label: "ไอคอนที่ 2" },
+                        { value: 3, label: "ไอคอนที่ 3" },
+                      ]}
                     />
                   </Form.Item>
                 </Col>

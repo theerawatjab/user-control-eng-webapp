@@ -12,18 +12,20 @@ import {
   Breadcrumb,
   notification,
   InputNumber,
+  Flex,
 } from "antd";
 import { useRouter } from "next/navigation";
 import { validateEmailInput } from "@/app/utils";
+import { ThemButtonColor } from "@/app/utils/constants";
 
-export default function NewSystemPage() {
+export default function SystemDetailPage() {
   const { Title } = Typography;
   const [form] = Form.useForm();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [api, contextHolder] = notification.useNotification();
 
-  const fetchNewSystem = async () => {
+  const fetchSystemDetail = async () => {
     try {
     } catch (error) {
       console.log("error: ", error);
@@ -32,7 +34,7 @@ export default function NewSystemPage() {
   };
 
   useEffect(() => {
-    fetchNewSystem();
+    fetchSystemDetail();
   }, []);
 
   if (loading) {
@@ -51,7 +53,7 @@ export default function NewSystemPage() {
           <Row>
             <Col span={24}>
               <Title style={{ marginTop: 0, marginBottom: 0, fontSize: 18 }}>
-                {"ระบบที่เปิดใช้งาน"}
+                {"รายละเอียดระบบที่เปิดใช้งาน"}
               </Title>
             </Col>
           </Row>
@@ -70,7 +72,7 @@ export default function NewSystemPage() {
                       </a>
                     ),
                   },
-                  { title: "เพิ่ม" },
+                  { title: "xxx" },
                 ]}
               />
             </Col>
@@ -156,14 +158,25 @@ export default function NewSystemPage() {
                   </Form.Item>
                 </Col>
               </Row>
-              <Row style={{ textAlign: "right" }}>
+              <Row>
                 <Col span={24}>
-                  <Button
-                    className="chemds-button"
-                    type="primary"
-                    htmlType="submit">
-                    เพิ่ม
-                  </Button>
+                  <Form.Item>
+                    <Flex justify={"right"} align={"center"} gap="small">
+                      <Button
+                        className="chemds-button"
+                        type="primary"
+                        htmlType="submit"
+                        style={{ backgroundColor: ThemButtonColor.Reject }}>
+                        แก้ไข
+                      </Button>
+                      <Button
+                        className="chemds-button"
+                        type="primary"
+                        style={{ backgroundColor: ThemButtonColor.Delete }}>
+                        ลบ
+                      </Button>
+                    </Flex>
+                  </Form.Item>
                 </Col>
               </Row>
             </Form>

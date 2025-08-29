@@ -16,14 +16,14 @@ import {
 import { useRouter } from "next/navigation";
 import { validateEmailInput } from "@/app/utils";
 
-export default function NewSystemPage() {
+export default function NewRolePage() {
   const { Title } = Typography;
   const [form] = Form.useForm();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [api, contextHolder] = notification.useNotification();
 
-  const fetchNewSystem = async () => {
+  const fetchNewRole = async () => {
     try {
     } catch (error) {
       console.log("error: ", error);
@@ -32,7 +32,7 @@ export default function NewSystemPage() {
   };
 
   useEffect(() => {
-    fetchNewSystem();
+    fetchNewRole();
   }, []);
 
   if (loading) {
@@ -51,7 +51,7 @@ export default function NewSystemPage() {
           <Row>
             <Col span={24}>
               <Title style={{ marginTop: 0, marginBottom: 0, fontSize: 18 }}>
-                {"ระบบที่เปิดใช้งาน"}
+                {"สิทธิ์ใหม่สำหรับเข้าถึงระบบนี้"}
               </Title>
             </Col>
           </Row>
@@ -64,9 +64,20 @@ export default function NewSystemPage() {
                       <a
                         onClick={() => {
                           setLoading(true);
-                          router.push(`/private/system`);
+                          router.push(`/private/setting`);
                         }}>
-                        ระบบที่เปิดใช้งาน
+                        การตั้งค่า
+                      </a>
+                    ),
+                  },
+                  {
+                    title: (
+                      <a
+                        onClick={() => {
+                          setLoading(true);
+                          router.push(`/private/setting/role`);
+                        }}>
+                        สิทธิ์เข้าถึงระบบนี้
                       </a>
                     ),
                   },
@@ -77,6 +88,27 @@ export default function NewSystemPage() {
           </Row>
           <div className="chemds-container">
             <Form layout="vertical" form={form} style={{ maxWidth: "none" }}>
+              <Row>
+                <Col span={12}>
+                  <Form.Item
+                    layout="vertical"
+                    name="sequence"
+                    label="ลำดับ"
+                    style={{ width: "90%" }}
+                    rules={[
+                      {
+                        required: true,
+                        message: "กรุณาใส่ข้อมูล ลำดับ!",
+                      },
+                    ]}>
+                    <InputNumber
+                      min={1}
+                      placeholder="ลำดับ"
+                      style={{ width: "100%" }}
+                    />
+                  </Form.Item>
+                </Col>
+              </Row>
               <Row>
                 <Col span={12}>
                   <Form.Item
@@ -113,27 +145,6 @@ export default function NewSystemPage() {
                     ]}>
                     <Input
                       placeholder="ชื่อภาษาอังกฤษ"
-                      allowClear
-                      style={{ width: "100%" }}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={12}>
-                  <Form.Item
-                    layout="vertical"
-                    name="shortName"
-                    label="ชื่อย่อ"
-                    style={{ width: "90%" }}
-                    rules={[
-                      {
-                        required: true,
-                        message: "กรุณาใส่ข้อมูล ชื่อย่อ!",
-                      },
-                    ]}>
-                    <Input
-                      placeholder="ชื่อย่อ"
                       allowClear
                       style={{ width: "100%" }}
                     />
